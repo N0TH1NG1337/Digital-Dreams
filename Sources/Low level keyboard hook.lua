@@ -74,16 +74,16 @@ local hooks do
 
     hooks.initialize = function()
 
-        local module_handle = ffi.C.GetModuleHandleA(NONE)
+        -- No need to get Module Handle since LowLevelKeyboardProc is global.
+        --local module_handle = ffi.C.GetModuleHandleA(NONE)
+        --if not ffi.istype("void*", module_handle) then 
+        --    hooks.keyboard_handle = NONE
 
-        if not ffi.istype("void*", module_handle) then 
-            hooks.keyboard_handle = NONE
+        --    return false
+        --end
 
-            return false
-        end
-
-        -- Low level keyboard hook : index 13, main thread
-        hooks.keyboard_handle = ffi.C.SetWindowsHookExA(13, ffi.cast("HOOKPROC", low_level_keyboard_hook), module_handle, 0)
+        -- Low level keyboard hook : index 13, global
+        hooks.keyboard_handle = ffi.C.SetWindowsHookExA(13, ffi.cast("HOOKPROC", low_level_keyboard_hook), ffi.cast("void*", 0), 0)
 
         hooks.attach("shutdown", hooks.destroy, "lua::hooks::destroy")
 
